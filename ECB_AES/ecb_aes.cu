@@ -13,7 +13,7 @@
 #include "device_launch_parameters.h"
 
 
-#define BLOCK_SIZE 32
+#define BLOCK_SIZE 16
 
 using namespace std;
 
@@ -96,6 +96,18 @@ static char* VectorToArray(vector<char> vec, int size) {
 		arr[i] = vec[i];
 	}
 	return arr;
+}
+
+static vector<char> PadToMultipleOfN(vector<char> data, int N) {
+	if (data.size() % N == 0) {
+		return data;
+	}
+	int desiredSize = ((data.size() / N) + 1) * N;
+	int diff = desiredSize - data.size();
+	for (int i = 0; i < diff; ++i) {
+		data.push_back('\0');
+	}
+	return data;
 }
 
 static vector<char> ReadBytes(char const* filename) {
@@ -271,7 +283,16 @@ __global__ void kernel(char* plaintext, char * ciphertext, int * size, CudaRijnd
 }
 
 void RunOnGpu(CRijndael rijndael) {
-
+	vector<char> data = ReadBytes("data/test.txt");
+	stringstream ss;
+	ss << "Original size: " << data.size();
+	Log(ss.str());
+	data = PadToMultipleOfN(data, BLOCK_SIZE);
+	ss.str(string());
+	ss << "Padded data size: " << data.size();
+	Log(ss.str());
+	auto startTime = CurrentTime();
+	// TODO:
 }
 
 
