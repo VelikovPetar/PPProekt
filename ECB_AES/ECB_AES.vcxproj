@@ -85,13 +85,16 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <CudaCompile Include="aes_ecb_cuda.cu" />
     <CudaCompile Include="ecb_aes.cu" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Rijndael.h" />
+    <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Rijndael.cpp" />
+    <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="test.txt" />
