@@ -14,7 +14,7 @@
 #include "Utils.h"
 
 
-#define BLOCK_SIZE 16
+#define BLOCK_SIZE 32
 
 using namespace std;
 
@@ -168,7 +168,7 @@ void RunSerialOnCpu(CRijndael rijndael) {
 	Utils::WriteBytes(decryptedFileBytes, "data/dec_image.jpg");
 
 }
-//
+
 //void main()
 //{
 //	try

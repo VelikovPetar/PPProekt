@@ -12,7 +12,7 @@
 #include "device_launch_parameters.h"
 #include "Utils.h"
 
-#define BLOCK_SIZE 32
+#define BLOCK_SIZE 16
 #define THREADS_PER_BLOCK 1024
 
 using namespace std;
@@ -474,21 +474,18 @@ __global__ void kernel(char* plaintext, char * ciphertext, int * size, CudaRijnd
 void RunOnGpu(CudaRijndael rijndael, int numThreadsPerBlock) {
 	vector<char> data = Utils::ReadBytes("data/image.jpg");
 	stringstream ss;
-	ss << "Original size: " << data.size();
-	Utils::Log(ss.str());
-	data = Utils::PadToMultipleOfN(data, BLOCK_SIZE);
-	ss.str(string());
-	ss << "Padded data size: " << data.size();
-	Utils::Log(ss.str());
-	// TODO:
+	data = Utils::PadToMultipleOfN(data, BLOCK_SIZE);;
 	int size = data.size();
+	ss << "Paded size : " << data.size();
+	Utils::Log(ss.str());
+	ss.str(string());
 	char *h_plaintext = Utils::VectorToArray(data, size);
 	char *h_ciphertext = new char[size];
 	char *d_plaintext;
 	char *d_ciphertext;
 	int * d_size;
 	CudaRijndael *d_rijndael;
-	Utils::Log("Allocationg cuda mem...");
+	Utils::Log("Allocating cuda mem...");
 	auto startTime = Utils::CurrentTime();
 	cudaMalloc((void**)&d_plaintext, size * sizeof(char));
 	cudaMalloc((void**)&d_ciphertext, size * sizeof(char));
@@ -537,8 +534,9 @@ void RunOnGpu(CudaRijndael rijndael, int numThreadsPerBlock) {
 	rijndael.Decrypt(h_ciphertext, decrypted, size, CudaRijndael::ECB);
 	Utils::Log("Decrypted.");
 	vector<char> vDecrypted = Utils::ArrayToVector(decrypted, size);
+	vector<char> decrNoPadding(vDecrypted.begin(), vDecrypted.begin() + size);
 	Utils::Log("Start writing to file.[decrypted]");
-	Utils::WriteBytes(vDecrypted, "data/decrypted_image.jpg");
+	Utils::WriteBytes(decrNoPadding, "data/decrypted_image.jpg");
 	Utils::Log("End writing to file.[decrypted]");
 	delete[] h_ciphertext;
 	delete[] decrypted;
